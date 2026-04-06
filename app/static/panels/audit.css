@@ -143,7 +143,7 @@ button[type="submit"]:hover {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
-  overflow: hidden;
+  overflow-x: auto;
   box-shadow: 0 1px 2px rgba(26, 29, 38, 0.06);
 }
 
@@ -181,6 +181,11 @@ button[type="submit"]:hover {
 }
 
 .audit-table-wrap .narrow {
+  white-space: nowrap;
+}
+
+.audit-table-wrap .col-when {
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
@@ -284,12 +289,19 @@ tr.audit-detail-row td {
 
 .audit-detail header {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem 1rem;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
   margin-bottom: 0.75rem;
   padding-bottom: 0.65rem;
   border-bottom: 1px solid var(--border-soft);
+}
+
+.audit-detail-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
 }
 
 .audit-detail header h2 {
@@ -303,6 +315,31 @@ tr.audit-detail-row td {
   color: var(--muted);
   font-family: ui-monospace, monospace;
   word-break: break-all;
+}
+
+.audit-detail-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 0.55rem 1.25rem;
+}
+
+.audit-detail-fact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.audit-detail-fact .fact-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  font-weight: 650;
+}
+
+.audit-detail-fact .fact-value {
+  font-size: 0.88rem;
+  word-break: break-word;
 }
 
 .audit-detail pre {
@@ -502,8 +539,14 @@ tr.audit-detail-row td {
 }
 
 .timeline-audit-id,
-.timeline-path {
+.timeline-path,
+.timeline-actor,
+.timeline-when {
   font-size: 0.78rem;
+}
+
+.timeline-when {
+  font-variant-numeric: tabular-nums;
 }
 
 .timeline-warning {

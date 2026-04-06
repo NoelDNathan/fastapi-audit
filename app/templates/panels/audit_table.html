@@ -20,6 +20,8 @@
         <th>Entity</th>
         <th class="narrow">Entity ID</th>
         <th>Path</th>
+        <th>Changed by</th>
+        <th class="col-when">When</th>
         <th class="narrow">Detail</th>
       </tr>
     </thead>
@@ -32,6 +34,8 @@
         <td>{{ p.get('entity', '—') }}</td>
         <td class="mono narrow">{{ p.get('entity_id', '—') }}</td>
         <td class="mono">{{ row.url }}</td>
+        <td>{{ row.changed_by }}</td>
+        <td class="mono col-when">{% if row.changed_at %}{{ row.changed_at.strftime('%Y-%m-%d %H:%M:%S') }}{% else %}—{% endif %}</td>
         <td class="narrow">
           <button
             type="button"
@@ -40,7 +44,7 @@
             hx-target="closest tr"
             hx-swap="afterend"
             hx-on::before-request="document.querySelectorAll('tr.audit-detail-row').forEach(function (el) { el.remove(); })"
-          >View</button>
+          >View details</button>
         </td>
       </tr>
       {% endfor %}

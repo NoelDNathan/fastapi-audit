@@ -58,6 +58,8 @@
     <span class="badge {% if row.method == 'INSERT' %}badge-insert{% elif row.method == 'UPDATE' %}badge-update{% elif row.method == 'DELETE' %}badge-delete{% else %}badge-muted{% endif %}">{{ row.method }}</span>
     <span class="timeline-audit-id mono">audit #{{ row.id }}</span>
     <span class="timeline-path mono">{{ row.url }}</span>
+    <span class="timeline-actor" title="Changed by">{{ row.changed_by }}</span>
+    <span class="timeline-when mono" title="When">{% if row.changed_at %}{{ row.changed_at.strftime('%Y-%m-%d %H:%M:%S') }}{% else %}—{% endif %}</span>
   </div>
 
   {% if truncated %}

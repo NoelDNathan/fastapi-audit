@@ -1,9 +1,25 @@
 <tr class="audit-detail-row">
-  <td colspan="6">
+  <td colspan="8">
     <article class="audit-detail">
       <header>
-        <h2>Audit #{{ row.id }}</h2>
-        <span class="meta">{{ row.method }} · {{ row.url }}</span>
+        <div class="audit-detail-title-row">
+          <h2>Audit #{{ row.id }}</h2>
+          <span class="meta">{{ row.method }} · {{ row.url }}</span>
+        </div>
+        <div class="audit-detail-facts" aria-label="Request metadata">
+          <div class="audit-detail-fact">
+            <span class="fact-label">Changed by</span>
+            <span class="fact-value">{{ row.changed_by }}</span>
+          </div>
+          <div class="audit-detail-fact">
+            <span class="fact-label">When</span>
+            <span class="fact-value mono">{% if row.changed_at %}{{ row.changed_at.strftime('%Y-%m-%d %H:%M:%S') }}{% else %}—{% endif %}</span>
+          </div>
+          <div class="audit-detail-fact">
+            <span class="fact-label">IP address</span>
+            <span class="fact-value mono">{% if row.ip_address %}{{ row.ip_address }}{% else %}—{% endif %}</span>
+          </div>
+        </div>
       </header>
       <pre>{{ formatted }}</pre>
       <div class="close-row">
