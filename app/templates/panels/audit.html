@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Audit log</title>
+  <link rel="stylesheet" href="/static/panels/audit.css" />
+  <script src="https://unpkg.com/htmx.org@2.0.4" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="page-head">
+      <div>
+        <h1>Audit log</h1>
+        <p>Entity change history (read-only). Filters refresh the table via HTMX.</p>
+      </div>
+      <nav class="links">
+        <a href="/docs">OpenAPI docs</a>
+        ·
+        <a href="/redoc">ReDoc</a>
+      </nav>
+    </header>
+    <section class="card timeline-card" aria-label="Entity timeline">
+      <h2 class="card-heading">Entity timeline</h2>
+      <p class="card-lead">
+        Select an entity and its primary key to browse audit events in chronological order.
+        Each step shows only the field changes recorded for that event (before / after).
+        After loading, use <kbd>←</kbd> / <kbd>→</kbd> to move between events (not while typing in a field).
+      </p>
+      <form
+        id="timeline-load-form"
+        class="timeline-load-form"
+        hx-get="/admin/audit/timeline/view"
+        hx-target="#audit-timeline-host"
+        hx-trigger="submit"
+      >
+        <div>
+          <label for="timeline-entity">Entity</label>
+          <input
+            id="timeline-entity"
+            type="search"
+            name="entity"
+            list="entity-suggestions"
+            required
+            placeholder="e.g. Book"
+            autocomplete="off"
+          />
+        </div>
+        <div>
+          <label for="timeline-entity-id">Entity ID</label>
+          <input
+            id="timeline-entity-id"
+            type="text"
+            name="entity_id"
+            required
+            inputmode="numeric"
+            placeholder="Primary key"
+            autocomplete="off"
+          />
+        </div>
+        <input type="hidden" name="step" value="0" />
+        <div class="btn-row">
+          <button type="submit">Load timeline</button>
+        </div>
+      </form>
+      <div id="audit-timeline-host" class="audit-timeline-host">
+        <p class="timeline-placeholder">Enter entity and ID, then load the timeline.</p>
+      </div>
+    </section>
+
+    <section class="card" aria-label="Filters">
+      <form
+        id="audit-filters"
+        hx-get="/admin/audit/table"
+        hx-target="#audit-table-host"
+        hx-trigger="change delay:280ms from:select, change delay:350ms from:input, submit"
+        hx-vals='{"page": "1"}'
+      >
+        <div>
+          <label for="filter-method">Action</label>
+          <select id="filter-method" name="method">
+            <option value="">Any</option>
+            <option value="INSERT">INSERT</option>
+            <option value="UPDATE">UPDATE</option>
+            <option value="DELETE">DELETE</option>
+          </select>
+        </div>
+        <div>
+          <label for="filter-entity">Entity</label>
+          <input
+            id="filter-entity"
+            type="search"
+            name="entity"
+            list="entity-suggestions"
+            placeholder="e.g. Book"
+            autocomplete="off"
+          />
+          <span
+            class="htmx-datalist-loader"
+            hx-get="/admin/audit/meta/entities"
+            hx-trigger="load"
+            hx-target="#entity-suggestions"
+            hx-swap="innerHTML"
+            hidden
+            aria-hidden="true"
+          ></span>
+          <datalist id="entity-suggestions"></datalist>
+        </div>
+        <div>
+          <label for="filter-entity-id">Entity ID</label>
+          <input id="filter-entity-id" type="text" name="entity_id" inputmode="numeric" placeholder="Primary key" autocomplete="off" />
+        </div>
+        <div class="btn-row">
+          <button type="submit">Apply</button>
+        </div>
+      </form>
+    </section>
+
+    <div
+      id="audit-table-host"
+      hx-get="/admin/audit/table"
+      hx-trigger="load"
+      hx-include="#audit-filters"
+    ></div>
+  </div>
+  <script>
+    (function () {
+      document.addEventListener("keydown", function (e) {
+        if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+        var el = e.target;
+        if (el && el.closest && el.closest("input, textarea, select")) return;
+        if (el && el.isContentEditable) return;
+        var host = document.getElementById("audit-timeline-host");
+        if (!host) return;
+        var panel = host.querySelector(".timeline-panel[data-timeline-nav]");
+        if (!panel) return;
+        var url =
+          e.key === "ArrowLeft"
+            ? panel.getAttribute("data-timeline-prev-url")
+            : panel.getAttribute("data-timeline-next-url");
+        if (!url) return;
+        e.preventDefault();
+        htmx.ajax("GET", url, { target: "#audit-timeline-host", swap: "innerHTML" });
+      });
+    })();
+  </script>
+</body>
+</html>

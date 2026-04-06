@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fastapi-audit"
+version = "0.1.0"
+description = "FastAPI application with SQLAlchemy, change auditing, and admin-style audit panels."
+readme = "README.md"
+requires-python = ">=3.12"
+dynamic = ["dependencies"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==9.0.2",
+    "pytest-asyncio==1.3.0",
+    "pytest-cov==7.0.0",
+    "testcontainers[postgres]==4.14.2",
+    "httpx==0.28.1",
+    "ruff==0.14.9",
+    "black==25.12.0",
+    "mypy==1.19.1",
+    "pre-commit==3.5.0",
+]
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirement.txt"] }
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+
+[tool.setuptools.package-data]
+app = ["static/**/*", "templates/**/*"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = ["-p", "no:anchorpy", "--ignore=tests/integration"]
+markers = [
+    "integration: tests that need Docker (Testcontainers PostgreSQL); run pytest tests/integration",
+]

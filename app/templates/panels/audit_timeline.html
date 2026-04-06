@@ -1,0 +1,99 @@
+{% macro fmt_delta_val(v) -%}
+  {%- if v is none -%}
+  <span class="diff-empty">—</span>
+  {%- else -%}
+  <span class="diff-value">{{ v | tojson }}</span>
+  {%- endif -%}
+{%- endmacro %}
+
+<div
+  class="timeline-panel"
+  {% if has_rows %}
+  data-timeline-nav="1"
+  data-timeline-prev-url="{% if has_prev %}/admin/audit/timeline/view?{{ qs_base }}&step={{ step - 1 }}{% endif %}"
+  data-timeline-next-url="{% if has_next %}/admin/audit/timeline/view?{{ qs_base }}&step={{ step + 1 }}{% endif %}"
+  tabindex="0"
+  {% endif %}
+>
+  {% if not has_rows %}
+  <p class="timeline-empty">No audit events found for <strong>{{ entity }}</strong> id <code>{{ entity_id }}</code>.</p>
+  {% else %}
+  <div class="timeline-toolbar">
+    <button
+      type="button"
+      class="timeline-nav-btn"
+      {% if not has_prev %}disabled aria-disabled="true"{% endif %}
+      hx-get="/admin/audit/timeline/view?{{ qs_base }}&step={{ step - 1 }}"
+      hx-target="#audit-timeline-host"
+      hx-swap="innerHTML"
+    >← Previous event</button>
+
+    <div class="timeline-track" role="tablist" aria-label="Audit events in time order">
+      {% for i in range(total) %}
+      <button
+        type="button"
+        role="tab"
+        class="timeline-dot {% if i == step %}is-current{% elif i < step %}is-past{% else %}is-future{% endif %}"
+        aria-selected="{{ 'true' if i == step else 'false' }}"
+        title="Event {{ i + 1 }} of {{ total }}"
+        hx-get="/admin/audit/timeline/view?{{ qs_base }}&step={{ i }}"
+        hx-target="#audit-timeline-host"
+        hx-swap="innerHTML"
+      ><span class="sr-only">Event {{ i + 1 }}</span></button>
+      {% endfor %}
+    </div>
+
+    <button
+      type="button"
+      class="timeline-nav-btn"
+      {% if not has_next %}disabled aria-disabled="true"{% endif %}
+      hx-get="/admin/audit/timeline/view?{{ qs_base }}&step={{ step + 1 }}"
+      hx-target="#audit-timeline-host"
+      hx-swap="innerHTML"
+    >Next event →</button>
+  </div>
+
+  <div class="timeline-event-meta">
+    <span class="timeline-step-label">Event <strong>{{ step + 1 }}</strong> of <strong>{{ total }}</strong></span>
+    <span class="badge {% if row.method == 'INSERT' %}badge-insert{% elif row.method == 'UPDATE' %}badge-update{% elif row.method == 'DELETE' %}badge-delete{% else %}badge-muted{% endif %}">{{ row.method }}</span>
+    <span class="timeline-audit-id mono">audit #{{ row.id }}</span>
+    <span class="timeline-path mono">{{ row.url }}</span>
+  </div>
+
+  {% if truncated %}
+  <p class="timeline-warning">Showing the first {{ total }} events only (limit reached).</p>
+  {% endif %}
+
+  <div class="timeline-diff card-inner">
+    <h3 class="timeline-diff-title">Changes in this event</h3>
+    {% if changes %}
+    <table class="timeline-diff-table">
+      <thead>
+        <tr>
+          <th scope="col">Field</th>
+          <th scope="col">Before</th>
+          <th scope="col">After</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for field, delta in changes | dictsort %}
+        {% if delta is mapping %}
+        <tr class="diff-row">
+          <th scope="row" class="field-name">{{ field }}</th>
+          <td class="diff-cell diff-old-col">
+            {% if 'old' in delta %}{{ fmt_delta_val(delta['old']) }}{% else %}<span class="diff-empty">—</span>{% endif %}
+          </td>
+          <td class="diff-cell diff-new-col">
+            {% if 'new' in delta %}{{ fmt_delta_val(delta['new']) }}{% else %}<span class="diff-empty">—</span>{% endif %}
+          </td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="timeline-no-changes">No field-level <code>changes</code> payload for this row (parse issue or empty snapshot).</p>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>

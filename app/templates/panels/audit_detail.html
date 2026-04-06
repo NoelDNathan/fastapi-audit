@@ -1,0 +1,14 @@
+<tr class="audit-detail-row">
+  <td colspan="6">
+    <article class="audit-detail">
+      <header>
+        <h2>Audit #{{ row.id }}</h2>
+        <span class="meta">{{ row.method }} · {{ row.url }}</span>
+      </header>
+      <pre>{{ formatted }}</pre>
+      <div class="close-row">
+        <button type="button" class="close" onclick="this.closest('tr.audit-detail-row').remove()">Dismiss</button>
+      </div>
+    </article>
+  </td>
+</tr>

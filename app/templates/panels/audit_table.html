@@ -1,0 +1,74 @@
+{% macro badge_method(m) -%}
+  {% if m == 'INSERT' %}
+    <span class="badge badge-insert">INSERT</span>
+  {% elif m == 'UPDATE' %}
+    <span class="badge badge-update">UPDATE</span>
+  {% elif m == 'DELETE' %}
+    <span class="badge badge-delete">DELETE</span>
+  {% else %}
+    <span class="badge badge-muted">{{ m }}</span>
+  {% endif %}
+{%- endmacro %}
+
+<div class="audit-table-wrap">
+  {% if rows %}
+  <table>
+    <thead>
+      <tr>
+        <th class="narrow">ID</th>
+        <th class="narrow">Action</th>
+        <th>Entity</th>
+        <th class="narrow">Entity ID</th>
+        <th>Path</th>
+        <th class="narrow">Detail</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      {% set p = parse_payload(row.response) %}
+      <tr>
+        <td class="mono narrow">{{ row.id }}</td>
+        <td class="narrow">{{ badge_method(row.method) }}</td>
+        <td>{{ p.get('entity', '—') }}</td>
+        <td class="mono narrow">{{ p.get('entity_id', '—') }}</td>
+        <td class="mono">{{ row.url }}</td>
+        <td class="narrow">
+          <button
+            type="button"
+            class="btn-detail"
+            hx-get="/admin/audit/{{ row.id }}/detail"
+            hx-target="closest tr"
+            hx-swap="afterend"
+            hx-on::before-request="document.querySelectorAll('tr.audit-detail-row').forEach(function (el) { el.remove(); })"
+          >View</button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">No audit rows match these filters.</p>
+  {% endif %}
+
+  <div class="pager">
+    <span>Page {{ page }} · up to {{ rows|length }} rows</span>
+    <span>
+      <a
+        href="#"
+        {% if not has_prev %}aria-disabled="true"{% endif %}
+        hx-get="/admin/audit/table?page={{ page - 1 }}"
+        hx-target="#audit-table-host"
+        hx-swap="innerHTML"
+        hx-include="#audit-filters"
+      >Previous</a>
+      <a
+        href="#"
+        {% if not has_next %}aria-disabled="true"{% endif %}
+        hx-get="/admin/audit/table?page={{ page + 1 }}"
+        hx-target="#audit-table-host"
+        hx-swap="innerHTML"
+        hx-include="#audit-filters"
+      >Next</a>
+    </span>
+  </div>
+</div>
