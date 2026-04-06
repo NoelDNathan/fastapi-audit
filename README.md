@@ -27,7 +27,27 @@ The API is exposed on port `8000` by default. Adjust `env.dev` and compose setti
 
 ## Use this repo as a package in another project
 
-The installable distribution name is `fastapi-audit`. Imports use the top-level package **`app`** (for example `from app.models.audit import audited`).
+The installable distribution name is `fastapi-audit`. Imports use the top-level package **`app`**.
+
+**Public audit API** (single entry point for other projects):
+
+```python
+from app.audit import (
+    audited,
+    AuditBase,
+    Audit,
+    attach_audit_request_context,
+    set_audit_request_context,
+    validate_audit_models,
+    register_audit_strategy,
+    AuditRequestContext,
+)
+```
+
+- `attach_audit_request_context(session, request, changed_by=...)` — FastAPI/sync or async session + `Request`; optional `changed_by` (defaults to anonymous).
+- `set_audit_request_context(session, AuditRequestContext(...))` — scripts, workers, or tests without an HTTP request.
+
+Deeper imports (e.g. `app.models.audit.decorators`) still work but are optional.
 
 ### Editable install (recommended while you develop)
 

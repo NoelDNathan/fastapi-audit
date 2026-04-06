@@ -1,7 +1,7 @@
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.models.audit import AuditBase, audited
+from app.audit import AuditBase, audited
 
 
 @audited(

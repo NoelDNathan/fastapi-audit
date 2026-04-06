@@ -7,8 +7,8 @@ from fastapi.staticfiles import StaticFiles
 
 import app.services.audit.custom_strategies  # noqa: F401 — register custom audit strategies first
 import app.models  # noqa: F401 — register ORM models on Base.metadata
+from app.audit import validate_audit_models
 from app.database import Base, engine
-from app.models.audit import validate_audit_models
 from app.panels.audit_panel import router as audit_panel_router
 from app.routers import book as book_router
 from app.routers import user as user_router
