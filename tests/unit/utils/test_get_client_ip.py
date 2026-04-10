@@ -5,7 +5,7 @@ from ipaddress import IPv4Address, IPv6Address
 import pytest
 from fastapi import Request
 
-from app.utils.get_client_ip import _extract_ip, get_client_ip
+from fastapi_audit.utils.get_client_ip import _extract_ip, get_client_ip
 
 
 def _make_request(

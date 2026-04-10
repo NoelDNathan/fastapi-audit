@@ -5,10 +5,10 @@ from sqlalchemy import Integer, String
 from sqlalchemy.inspection import inspect as sa_inspect
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.models.audit.decorators import audited
-from app.models.audit.exceptions import AuditConfigurationError
-from app.models.audit.orm import AuditBase
-from app.models.audit.validation import (
+from fastapi_audit.models.audit.decorators import audited
+from fastapi_audit.models.audit.exceptions import AuditConfigurationError
+from fastapi_audit.models.audit.orm import AuditBase
+from fastapi_audit.models.audit.validation import (
     validate_audit_config,
     validate_audit_models,
     validate_audit_on_delete,

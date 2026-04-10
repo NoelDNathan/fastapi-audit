@@ -12,7 +12,7 @@ FastAPI service with SQLAlchemy, **model change auditing** (decorators, sanitiza
 Set `DATABASE_URL` (for example in a `.env` file loaded by your process manager). Then:
 
 ```bash
-uvicorn app.main:app --reload
+uvicorn fastapi_audit.main:app --reload
 ```
 
 Open `/docs` for the interactive OpenAPI UI.
@@ -27,12 +27,12 @@ The API is exposed on port `8000` by default. Adjust `env.dev` and compose setti
 
 ## Use this repo as a package in another project
 
-The installable distribution name is `fastapi-audit`. Imports use the top-level package **`app`**.
+The installable distribution name is `fastapi-audit`. Imports use the top-level package **`fastapi_audit`** (Python module names cannot contain hyphens).
 
 **Public audit API** (single entry point for other projects):
 
 ```python
-from app.audit import (
+from fastapi_audit.audit import (
     audited,
     AuditBase,
     Audit,
@@ -47,7 +47,7 @@ from app.audit import (
 - `attach_audit_request_context(session, request, changed_by=...)` — FastAPI/sync or async session + `Request`; optional `changed_by` (defaults to anonymous).
 - `set_audit_request_context(session, AuditRequestContext(...))` — scripts, workers, or tests without an HTTP request.
 
-Deeper imports (e.g. `app.models.audit.decorators`) still work but are optional.
+Deeper imports (e.g. `fastapi_audit.models.audit.decorators`) still work but are optional.
 
 ### Editable install (recommended while you develop)
 
@@ -88,7 +88,7 @@ pip install dist/fastapi_audit-0.1.0-py3-none-any.whl
 
 ### Integrating in your own FastAPI app
 
-You typically import the pieces you need (audit mixins, `audited` decorator, sanitize helpers, optional panel router) and wire your own `FastAPI` instance, database session, and models. This repository’s `app/main.py` shows one full wiring example (lifespan, routers, static files).
+You typically import the pieces you need (audit mixins, `audited` decorator, sanitize helpers, optional panel router) and wire your own `FastAPI` instance, database session, and models. This repository’s `fastapi_audit/main.py` shows one full wiring example (lifespan, routers, static files).
 
 ## Tests
 
@@ -115,8 +115,8 @@ python -m pytest tests/unit/audit/test_sanitize.py::test_mask_none_and_scalar -v
 
 | Path | Role |
 |------|------|
-| `app/main.py` | FastAPI app factory and router registration |
-| `app/models/audit/` | Audit ORM base, decorators, validation, listeners |
-| `app/services/audit/` | Sanitization, request context, custom strategies |
-| `app/panels/` | Optional audit HTML panel (Jinja + static assets under `app/templates`, `app/static`) |
+| `fastapi_audit/main.py` | FastAPI app factory and router registration |
+| `fastapi_audit/models/audit/` | Audit ORM base, decorators, validation, listeners |
+| `fastapi_audit/services/audit/` | Sanitization, request context, custom strategies |
+| `fastapi_audit/panels/` | Optional audit HTML panel (Jinja + static assets under `fastapi_audit/templates`, `fastapi_audit/static`) |
 

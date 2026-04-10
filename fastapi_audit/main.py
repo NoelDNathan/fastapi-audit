@@ -5,13 +5,13 @@ from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
-import app.services.audit.custom_strategies  # noqa: F401 — register custom audit strategies first
-import app.models  # noqa: F401 — register ORM models on Base.metadata
-from app.audit import validate_audit_models
-from app.database import Base, engine
-from app.panels.audit_panel import router as audit_panel_router
-from app.routers import book as book_router
-from app.routers import user as user_router
+import fastapi_audit.services.audit.custom_strategies  # noqa: F401 — register custom audit strategies first
+import fastapi_audit.models  # noqa: F401 — register ORM models on Base.metadata
+from fastapi_audit.audit import validate_audit_models
+from fastapi_audit.database import Base, engine
+from fastapi_audit.panels.audit_panel import router as audit_panel_router
+from fastapi_audit.routers import book as book_router
+from fastapi_audit.routers import user as user_router
 
 
 @asynccontextmanager

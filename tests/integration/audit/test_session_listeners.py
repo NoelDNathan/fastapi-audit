@@ -9,7 +9,7 @@ from ipaddress import IPv4Address
 import pytest
 from sqlalchemy import func, select, update
 
-from app.services.audit.request_context import (
+from fastapi_audit.services.audit.request_context import (
     AUDIT_SESSION_INFO_KEY,
     AuditRequestContext,
     FALLBACK_CHANGED_BY,
@@ -20,14 +20,14 @@ pytestmark = pytest.mark.integration
 
 def _audit_by_method(session, method: str):
     """Get audit rows by method."""
-    from app.models.audit.orm import Audit
+    from fastapi_audit.models.audit.orm import Audit
 
     return list(session.scalars(select(Audit).where(Audit.method == method)))
 
 
 def _audit_count(session) -> int:
     """Get audit count."""
-    from app.models.audit.orm import Audit
+    from fastapi_audit.models.audit.orm import Audit
 
     return session.scalar(select(func.count()).select_from(Audit)) or 0
 
@@ -183,7 +183,7 @@ class TestDeleteAuditFlow:
         self, db_session, User_model, monkeypatch
     ):
         """Test delete without entity id uses safe path and payload."""
-        from app.models.audit import session_listeners as sl
+        from fastapi_audit.models.audit import session_listeners as sl
 
         user = create_user(
             db_session,
@@ -237,7 +237,7 @@ class TestDeleteAuditFlow:
         db_session.delete(user)
         db_session.commit()
 
-        from app.models.audit.orm import Audit
+        from fastapi_audit.models.audit.orm import Audit
 
         db_session.expire_all()
         upd = db_session.scalars(select(Audit).where(Audit.method == "UPDATE")).one()

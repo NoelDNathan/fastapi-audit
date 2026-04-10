@@ -28,10 +28,10 @@ dependencies = { file = ["requirement.txt"] }
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["app*"]
+include = ["fastapi_audit*"]
 
 [tool.setuptools.package-data]
-app = ["static/**/*", "templates/**/*"]
+fastapi_audit = ["static/**/*", "templates/**/*"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

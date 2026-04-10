@@ -4,16 +4,16 @@ import pytest
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.models.audit.change_set import (
+from fastapi_audit.models.audit.change_set import (
     any_on_delete_strategy_differs,
     changes_for_insert,
     resanitize_changes_for_delete,
     get_strategy,
 )
-from app.models.audit.decorators import audited
-from app.models.audit.orm import AuditBase
-from app.models.audit.exceptions import AuditConfigurationError
-from app.services.audit.sanitize import hash_value
+from fastapi_audit.models.audit.decorators import audited
+from fastapi_audit.models.audit.orm import AuditBase
+from fastapi_audit.models.audit.exceptions import AuditConfigurationError
+from fastapi_audit.services.audit.sanitize import hash_value
 
 
 

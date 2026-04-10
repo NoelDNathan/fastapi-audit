@@ -1,3 +1,3 @@
-from app.schemas.book import BookSchema
+from fastapi_audit.schemas.book import BookSchema
 
 __all__ = ["BookSchema"]

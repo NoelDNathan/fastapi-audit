@@ -1,7 +1,7 @@
 from sqlalchemy.inspection import inspect as sa_inspect
 
-from app.models.audit.exceptions import AuditConfigurationError
-from app.services.audit.sanitize import sanitize
+from fastapi_audit.models.audit.exceptions import AuditConfigurationError
+from fastapi_audit.services.audit.sanitize import sanitize
 
 
 DEFAULT_STRATEGY = "ignore"

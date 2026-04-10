@@ -5,7 +5,7 @@ from sqlalchemy import DateTime, Integer, String, func
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.database import Base
+from fastapi_audit.database import Base
 
 
 class AuditBase(Base):

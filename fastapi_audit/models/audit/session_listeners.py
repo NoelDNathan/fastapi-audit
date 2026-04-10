@@ -5,15 +5,15 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.inspection import inspect as sa_inspect
 from sqlalchemy.orm import Session
 
-from app.models.audit.change_set import (
+from fastapi_audit.models.audit.change_set import (
     any_on_delete_strategy_differs,
     changes_for_delete,
     changes_for_insert,
     changes_for_update,
     resanitize_changes_for_delete,
 )
-from app.models.audit.orm import Audit, AuditBase
-from app.services.audit.request_context import (
+from fastapi_audit.models.audit.orm import Audit, AuditBase
+from fastapi_audit.services.audit.request_context import (
     AUDIT_SESSION_INFO_KEY,
     FALLBACK_CHANGED_BY,
     AuditRequestContext,

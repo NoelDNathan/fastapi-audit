@@ -6,12 +6,12 @@ from fastapi import Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
-from app.services.audit.request_context import (
+from fastapi_audit.services.audit.request_context import (
     AUDIT_SESSION_INFO_KEY,
     DEFAULT_CHANGED_BY,
     AuditRequestContext,
 )
-from app.utils.get_client_ip import get_client_ip
+from fastapi_audit.utils.get_client_ip import get_client_ip
 
 
 def set_audit_request_context(

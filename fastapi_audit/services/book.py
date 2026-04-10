@@ -1,8 +1,8 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from app.models import Book
-from app.schemas.book import BookSchema
+from fastapi_audit.models import Book
+from fastapi_audit.schemas.book import BookSchema
 
 
 def list_books(db: Session):

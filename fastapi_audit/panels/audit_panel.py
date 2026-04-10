@@ -17,8 +17,8 @@ from sqlalchemy import and_, cast, select
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Session
 
-from app.database import get_db
-from app.models.audit import Audit
+from fastapi_audit.database import get_db
+from fastapi_audit.models.audit import Audit
 
 TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "templates" / "panels"
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))

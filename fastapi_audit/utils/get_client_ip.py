@@ -1,6 +1,6 @@
 import ipaddress
 from fastapi import Request
-from app.services.audit.request_context import ClientIPAddress
+from fastapi_audit.services.audit.request_context import ClientIPAddress
 
 
 def _extract_ip(raw: str) -> ClientIPAddress | None:

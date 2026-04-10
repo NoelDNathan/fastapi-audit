@@ -1,8 +1,8 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from app.models.user import User
-from app.schemas.user import UserSchema
+from fastapi_audit.models.user import User
+from fastapi_audit.schemas.user import UserSchema
 
 
 def _normalize_phone(phone: str | None) -> str | None:

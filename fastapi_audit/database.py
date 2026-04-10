@@ -5,7 +5,7 @@ from fastapi import Request
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-from app.utils.audit_session import attach_audit_request_context
+from fastapi_audit.utils.audit_session import attach_audit_request_context
 
 load_dotenv()
 

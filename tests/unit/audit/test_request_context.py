@@ -5,7 +5,7 @@ import ipaddress
 
 import pytest
 
-from app.services.audit.request_context import (
+from fastapi_audit.services.audit.request_context import (
     AUDIT_SESSION_INFO_KEY,
     DEFAULT_CHANGED_BY,
     FALLBACK_CHANGED_BY,

@@ -3,9 +3,9 @@
 import hashlib
 
 import pytest
-from app.services.audit.sanitize import VALID_STRATEGIES
-from app.services.audit import sanitize as sanitize_mod
-from app.services.audit.sanitize import (
+from fastapi_audit.services.audit.sanitize import VALID_STRATEGIES
+from fastapi_audit.services.audit import sanitize as sanitize_mod
+from fastapi_audit.services.audit.sanitize import (
     hash_value,
     mask,
     raw,
@@ -119,7 +119,7 @@ def test_register_audit_strategy_strips_name():
 
 def test_phone_last4_custom_strategy():
     """Test phone_last4 custom strategy."""
-    import app.services.audit.custom_strategies  # noqa: F401 — registers phone_last4
+    import fastapi_audit.services.audit.custom_strategies  # noqa: F401 — registers phone_last4
 
     assert sanitize("phone_last4", "+1 (555) 123-4567") == "***4567"
     assert sanitize("phone_last4", "12") == "***"

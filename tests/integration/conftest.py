@@ -1,11 +1,11 @@
 """
 Integration tests: PostgreSQL via Testcontainers.
 
-Run in isolation so ``app.database`` is first imported with the container URL::
+Run in isolation so ``fastapi_audit.database`` is first imported with the container URL::
 
     pytest tests/integration -v
 
-Do not run ``pytest tests`` in one process if ``tests/unit`` imports ``app.database``
+Do not run ``pytest tests`` in one process if ``tests/unit`` imports ``fastapi_audit.database``
 first (SQLite); integration needs a fresh interpreter with only this path collected.
 """
 
@@ -32,13 +32,13 @@ def _postgres_schema() -> Generator[None, None, None]:
         os.environ["DATABASE_URL"] = _sqlalchemy_psycopg2_url(
             postgres.get_connection_url()
         )
-        importlib.import_module("app.services.audit.custom_strategies")
-        importlib.import_module("app.database")
-        importlib.import_module("app.models.audit")
-        importlib.import_module("app.models.books")
-        importlib.import_module("app.models.user")
+        importlib.import_module("fastapi_audit.services.audit.custom_strategies")
+        importlib.import_module("fastapi_audit.database")
+        importlib.import_module("fastapi_audit.models.audit")
+        importlib.import_module("fastapi_audit.models.books")
+        importlib.import_module("fastapi_audit.models.user")
 
-        from app.database import Base, engine
+        from fastapi_audit.database import Base, engine
 
         Base.metadata.create_all(engine)
         yield
@@ -50,7 +50,7 @@ def db_session(_postgres_schema):  # noqa: ARG001 — ensures schema exists
     from sqlalchemy import text
     from sqlalchemy.orm import sessionmaker
 
-    from app.database import engine
+    from fastapi_audit.database import engine
 
     Session = sessionmaker(bind=engine)
     session = Session()
@@ -77,6 +77,6 @@ def db_session(_postgres_schema):  # noqa: ARG001 — ensures schema exists
 @pytest.fixture
 def User_model(_postgres_schema):  # noqa: ARG001
     """Fixture to get the User model."""
-    from app.models.user import User
+    from fastapi_audit.models.user import User
 
     return User

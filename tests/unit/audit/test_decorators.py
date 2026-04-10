@@ -7,7 +7,7 @@ from types import MappingProxyType
 
 import pytest
 
-from app.models.audit.decorators import audited
+from fastapi_audit.models.audit.decorators import audited
 
 
 def get_audited_class_mappings(

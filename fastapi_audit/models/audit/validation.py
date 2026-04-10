@@ -1,9 +1,9 @@
 from sqlalchemy.inspection import inspect 
 from sqlalchemy.orm import registry as Registry
 
-from app.models.audit.exceptions import AuditConfigurationError
-from app.models.audit.orm import AuditBase
-from app.services.audit.sanitize import VALID_STRATEGIES
+from fastapi_audit.models.audit.exceptions import AuditConfigurationError
+from fastapi_audit.models.audit.orm import AuditBase
+from fastapi_audit.services.audit.sanitize import VALID_STRATEGIES
 
 
 def _validate_mapping_keys_match_columns(

@@ -1,5 +1,5 @@
 """
-Ensure DATABASE_URL exists before app.database is imported (required at import time).
+Ensure DATABASE_URL exists before fastapi_audit.database is imported (required at import time).
 """
 
 import os
