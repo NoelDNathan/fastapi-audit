@@ -286,10 +286,10 @@ class TestContextResolution:
 class TestSanitizationRules:
     """Explicit checks that persisted ``changes`` match ``@audited`` strategies."""
 
-    def test_insert_masks_hash_and_phone_last4_per_config(
+    def test_insert_masks_hash_and_typed_mask_per_config(
         self, db_session, User_model
     ):
-        """Test insert masks hash and phone last4 per config."""
+        """Test insert applies mask:type=email and mask:type=phone per config."""
         user = create_user(
             db_session,
             User_model,
@@ -300,7 +300,7 @@ class TestSanitizationRules:
         payload = json.loads(_audit_by_method(db_session, "INSERT")[0].response)
         ch = payload["changes"]
         assert "id" not in ch
-        assert ch["email"] == {"new": "***"}
+        assert ch["email"] == {"new": "s***@example.com"}
         assert ch["name"] == {"new": "Plain"}
         assert ch["phone"] == {"new": "***3004"}
 

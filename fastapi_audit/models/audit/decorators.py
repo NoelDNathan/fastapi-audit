@@ -9,6 +9,9 @@ def audited(columns: dict[str, tuple[str, str]]):
     (strategy_for_insert_and_update, strategy_on_delete).
     on_delete must be equally or more strict than persist (see register_audit_strategy strictness).
 
+    Built-in masks: ``mask`` (generic ***), or ``mask:type=email``, ``mask:type=phone``,
+    ``mask:type=card``, ``mask:type=generic`` — all share the same strictness as ``mask``.
+
     __audit_config__ and __audit_config_on_delete__ are read-only mappings (MappingProxyType).
 
     Applying @audited more than once to the same class raises TypeError; use a single dict with

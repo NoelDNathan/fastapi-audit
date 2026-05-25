@@ -6,8 +6,14 @@ import pytest
 from fastapi_audit.services.audit.sanitize import VALID_STRATEGIES
 from fastapi_audit.services.audit import sanitize as sanitize_mod
 from fastapi_audit.services.audit.sanitize import (
+    MASK_STRICTNESS,
     hash_value,
+    is_valid_strategy,
     mask,
+    mask_email,
+    mask_phone,
+    mask_strategy_names,
+    parse_mask_strategy,
     raw,
     register_audit_strategy,
     registered_strategy_names,
@@ -49,6 +55,63 @@ def test_sanitize_builtins():
     assert sanitize("mask", "x") == "***"
     assert sanitize("hash", "x") == hashlib.sha256(b"x").hexdigest()
     assert sanitize("raw", "y") == "y"
+
+
+@pytest.mark.parametrize(
+    ("strategy", "value", "expected"),
+    [
+        ("mask:type=email", "alice@corp.com", "a***@corp.com"),
+        ("mask:type=email", "bad", "***"),
+        ("mask:type=phone", "+1 (555) 123-4567", "***4567"),
+        ("mask:type=phone", "12", "***"),
+        ("mask:type=card", "4242-4242-4242-4242", "***4242"),
+        ("mask:type=generic", "secret", "***"),
+        ("mask", "secret", "***"),
+    ],
+)
+def test_sanitize_mask_types(strategy, value, expected):
+    """Typed mask strategies share transforms at the same strictness level."""
+    assert sanitize(strategy, value) == expected
+    assert sanitize(strategy, None) is None
+
+
+def test_mask_email_and_phone_helpers():
+    """Direct mask helpers match sanitize for typed strategies."""
+    assert mask_email("bob@test.io") == "b***@test.io"
+    assert mask_phone("1002003004") == "***3004"
+
+
+def test_parse_mask_strategy_and_validity():
+    """Parse and validate mask parameter spellings."""
+    assert parse_mask_strategy("mask") == "generic"
+    assert parse_mask_strategy("mask:type=email") == "email"
+    assert parse_mask_strategy("mask:type=unknown") is None
+    assert parse_mask_strategy("mask:email") is None
+    assert is_valid_strategy("mask:type=phone")
+    assert not is_valid_strategy("mask:type=bad")
+
+
+def test_mask_types_share_strictness():
+    """All mask variants rank equal to plain mask."""
+    assert strategy_strictness("mask") == MASK_STRICTNESS
+    assert strategy_strictness("mask:type=email") == strategy_strictness("mask")
+    assert strategy_strictness("mask:type=phone") == strategy_strictness("mask:type=card")
+
+
+def test_register_audit_strategy_rejects_mask_namespace():
+    """Custom strategies cannot use built-in mask:type names."""
+    with pytest.raises(ValueError, match="reserved"):
+        register_audit_strategy("mask:type=email", mask, strictness=1)
+    with pytest.raises(ValueError, match="reserved"):
+        register_audit_strategy("mask", mask, strictness=600, override=True)
+
+
+def test_mask_strategy_names():
+    """Built-in mask spellings include plain mask and mask:type=* variants."""
+    names = mask_strategy_names()
+    assert "mask" in names
+    assert "mask:type=email" in names
+    assert "mask:type=generic" in names
 
 
 def test_sanitize_unknown_strategy_falls_back_to_raw():
@@ -117,13 +180,12 @@ def test_register_audit_strategy_strips_name():
     assert sanitize("spaced", 1) == 1
 
 
-def test_phone_last4_custom_strategy():
-    """Test phone_last4 custom strategy."""
-    import fastapi_audit.services.audit.custom_strategies  # noqa: F401 — registers phone_last4
+def test_valid_strategies_contains_mask_types():
+    """VALID_STRATEGIES accepts mask:type=* without registry entries."""
+    assert "mask:type=email" in VALID_STRATEGIES
+    assert VALID_STRATEGIES["mask:type=email"] == MASK_STRICTNESS
+    assert "mask:type=not_a_type" not in VALID_STRATEGIES
 
-    assert sanitize("phone_last4", "+1 (555) 123-4567") == "***4567"
-    assert sanitize("phone_last4", "12") == "***"
-    assert sanitize("phone_last4", None) is None
 
 def test_registry_is_reset_between_tests():
     """Test registry is reset between tests."""
@@ -172,10 +234,12 @@ def test_strictness_view_iterates_all_keys():
 
 
 def test_strictness_view_contains():
-    """Test strictness view contains built-ins."""
+    """Test strictness view contains built-ins and mask parameterizations."""
     assert "mask" in VALID_STRATEGIES
+    assert "mask:type=phone" in VALID_STRATEGIES
     assert "hash" in VALID_STRATEGIES
     assert "nonexistent" not in VALID_STRATEGIES
+    assert "mask:type=invalid" not in VALID_STRATEGIES
 
 
 def test_strictness_view_keyerror_on_missing():

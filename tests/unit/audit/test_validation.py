@@ -50,6 +50,23 @@ def test_validate_audit_config_invalid_strategy():
         )
 
 
+def test_validate_audit_config_accepts_mask_type_email():
+    """mask:type=* spellings are valid without separate registry entries."""
+    validate_audit_config(
+        SampleAuditedEntity,
+        {"id": "ignore", "code": "mask:type=email"},
+    )
+
+
+def test_validate_audit_config_rejects_unknown_mask_type():
+    """Unknown mask:type values are rejected like other invalid strategies."""
+    with pytest.raises(AuditConfigurationError, match="invalid audit strategies"):
+        validate_audit_config(
+            SampleAuditedEntity,
+            {"id": "ignore", "code": "mask:type=unknown"},
+        )
+
+
 def test_validate_audit_config_unknown_columns():
     """Persist map must not contain keys that are not mapper columns."""
     with pytest.raises(AuditConfigurationError, match="unknown columns"):

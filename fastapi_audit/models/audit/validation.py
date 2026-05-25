@@ -3,7 +3,7 @@ from sqlalchemy.orm import registry as Registry
 
 from fastapi_audit.models.audit.exceptions import AuditConfigurationError
 from fastapi_audit.models.audit.orm import AuditBase
-from fastapi_audit.services.audit.sanitize import VALID_STRATEGIES
+from fastapi_audit.services.audit.sanitize import VALID_STRATEGIES, is_valid_strategy
 
 
 def _validate_mapping_keys_match_columns(
@@ -33,12 +33,12 @@ def validate_strategies(
     *,
     invalid_label: str = "invalid audit strategies",
 ) -> None:
-    """Validate that every strategy name is registered."""
+    """Validate that every strategy name is registered or a built-in mask parameterization."""
     cls_name = cls.__name__
     invalid = {
         k: v
         for k, v in config.items()
-        if v not in VALID_STRATEGIES
+        if not is_valid_strategy(v)
     }
     if invalid:
         raise AuditConfigurationError(f"{cls_name} {invalid_label}: {invalid}")
@@ -75,7 +75,7 @@ def validate_on_delete_vs_persist(
 ) -> None:
     """
     on_delete must be equally or more strict than persist (higher strictness rank wins).
-    Built-ins: ignore (1000) > hash (800) > mask (500) > raw (100). Custom strategies
+    Built-ins: ignore (1000) > hash (800) > mask / mask:type=* (500) > raw (100). Custom strategies
     use ranks chosen at registration; on_delete rank must be >= persist rank per column.
 
     Every persist key must appear in on_delete. Keys present only in on_delete are treated

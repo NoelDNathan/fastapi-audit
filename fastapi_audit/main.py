@@ -5,7 +5,6 @@ from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
-import fastapi_audit.services.audit.custom_strategies  # noqa: F401 — register custom audit strategies first
 import fastapi_audit.models  # noqa: F401 — register ORM models on Base.metadata
 from fastapi_audit.audit import validate_audit_models
 from fastapi_audit.database import Base, engine

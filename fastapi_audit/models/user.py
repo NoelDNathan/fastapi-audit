@@ -7,9 +7,9 @@ from fastapi_audit.audit import AuditBase, audited
 @audited(
     {
         "id": ("ignore", "ignore"),
-        "email": ("mask", "ignore"),
+        "email": ("mask:type=email", "ignore"),
         "name": ("raw", "hash"),
-        "phone": ("phone_last4", "hash"),
+        "phone": ("mask:type=phone", "hash"),
     }
 )
 class User(AuditBase):
