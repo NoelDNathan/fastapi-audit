@@ -32,6 +32,10 @@ def _postgres_schema() -> Generator[None, None, None]:
         os.environ["DATABASE_URL"] = _sqlalchemy_psycopg2_url(
             postgres.get_connection_url()
         )
+        os.environ.setdefault(
+            "AUDIT_HASH_PEPPER",
+            "test-audit-pepper-at-least-32-characters-long",
+        )
         importlib.import_module("fastapi_audit.services.audit.custom_strategies")
         importlib.import_module("fastapi_audit.database")
         importlib.import_module("fastapi_audit.models.audit")

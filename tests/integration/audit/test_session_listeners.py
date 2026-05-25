@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 from ipaddress import IPv4Address
 
@@ -14,6 +13,7 @@ from fastapi_audit.services.audit.request_context import (
     AuditRequestContext,
     FALLBACK_CHANGED_BY,
 )
+from fastapi_audit.services.audit.sanitize import hash_value
 
 pytestmark = pytest.mark.integration
 
@@ -63,7 +63,7 @@ class TestInsertAuditFlow:
         assert payload["entity_id"] == user.id
         changes = payload["changes"]
         assert "id" not in changes
-        assert changes["email"] == {"new": "***"}
+        assert changes["email"] == {"new": "a***@example.com"}
         assert changes["name"] == {"new": "Alice"}
         assert changes["phone"] == {"new": "***4567"}
 
@@ -174,9 +174,9 @@ class TestDeleteAuditFlow:
         changes = payload["changes"]
         assert "id" not in changes
         assert "email" not in changes
-        assert changes["name"]["old"] == hashlib.sha256(b"SecretName").hexdigest()
+        assert changes["name"]["old"] == hash_value("SecretName")
         assert changes["name"]["new"] is None
-        assert changes["phone"]["old"] == hashlib.sha256(b"9998887777").hexdigest()
+        assert changes["phone"]["old"] == hash_value("9998887777")
         assert changes["phone"]["new"] is None
 
     def test_delete_without_entity_id_uses_safe_path_and_payload(
@@ -243,8 +243,8 @@ class TestDeleteAuditFlow:
         upd = db_session.scalars(select(Audit).where(Audit.method == "UPDATE")).one()
         after = json.loads(upd.response)["changes"]
         assert "email" not in after
-        assert after["name"]["old"] == hashlib.sha256(b"N1").hexdigest()
-        assert after["name"]["new"] == hashlib.sha256(b"N2").hexdigest()
+        assert after["name"]["old"] == hash_value("N1")
+        assert after["name"]["new"] == hash_value("N2")
 
 
 class TestContextResolution:
@@ -320,5 +320,5 @@ class TestSanitizationRules:
 
         ch = json.loads(_audit_by_method(db_session, "DELETE")[0].response)["changes"]
         assert "email" not in ch
-        assert ch["name"]["old"] == hashlib.sha256(b"ToHash").hexdigest()
-        assert ch["phone"]["old"] == hashlib.sha256(b"1112223333").hexdigest()
+        assert ch["name"]["old"] == hash_value("ToHash")
+        assert ch["phone"]["old"] == hash_value("1112223333")

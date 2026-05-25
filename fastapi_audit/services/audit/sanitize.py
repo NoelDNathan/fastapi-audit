@@ -1,7 +1,7 @@
 """
 Audit value transforms and strategy registry.
 
-Built-in strategies: ignore, hash, mask, raw (each has a strictness rank).
+Built-in strategies: ignore, hash (Argon2id + pepper), mask, raw (each has a strictness rank).
 Parameterized masks use the same rank as ``mask``: ``mask:type=email``,
 ``mask:type=phone``, ``mask:type=card``, ``mask:type=generic`` (or plain ``mask``).
 
@@ -11,11 +11,12 @@ Higher strictness = stronger hiding; on_delete strategy must be >= persist stric
 
 from __future__ import annotations
 
-import hashlib
 import re
 from collections.abc import Callable, Mapping
 from types import MappingProxyType
 from typing import Any
+
+from fastapi_audit.security.argon2_hash import hash_audit_value
 
 AuditTransform = Callable[[Any], Any]
 
@@ -112,10 +113,10 @@ def mask_strategy_names() -> frozenset[str]:
 
 
 def hash_value(value: Any) -> Any:
-    """SHA-256 hex digest of str(value)."""
+    """Argon2id hex digest of str(value) (deterministic per deployment pepper)."""
     if value is None:
         return None
-    return hashlib.sha256(str(value).encode()).hexdigest()
+    return hash_audit_value(str(value))
 
 
 def raw(value: Any) -> Any:

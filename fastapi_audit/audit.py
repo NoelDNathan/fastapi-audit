@@ -41,6 +41,7 @@ from fastapi_audit.services.audit.request_context import (
     AuditRequestContext,
     ClientIPAddress,
 )
+from fastapi_audit.security import hash_password, verify_password
 from fastapi_audit.services.audit.sanitize import VALID_STRATEGIES, sanitize
 from fastapi_audit.utils.audit_session import (
     attach_audit_request_context,
@@ -58,6 +59,7 @@ __all__ = [
     "ClientIPAddress",
     "VALID_STRATEGIES",
     "attach_audit_request_context",
+    "hash_password",
     "audited",
     "register_audit_strategy",
     "registered_strategy_names",
@@ -68,4 +70,5 @@ __all__ = [
     "validate_audit_models",
     "validate_audit_on_delete",
     "validate_on_delete_vs_persist",
+    "verify_password",
 ]

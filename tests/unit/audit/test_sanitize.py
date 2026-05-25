@@ -1,10 +1,9 @@
 """Unit tests for audit strategy registry and sanitize()."""
 
-import hashlib
-
 import pytest
 from fastapi_audit.services.audit.sanitize import VALID_STRATEGIES
 from fastapi_audit.services.audit import sanitize as sanitize_mod
+from fastapi_audit.security.argon2_hash import hash_audit_value, reset_audit_hash_config
 from fastapi_audit.services.audit.sanitize import (
     MASK_STRICTNESS,
     hash_value,
@@ -25,7 +24,9 @@ from fastapi_audit.services.audit.sanitize import (
 @pytest.fixture(autouse=True)
 def reset_audit_strategies():
     """Restore built-in strategies after each test (custom registration is global)."""
+    reset_audit_hash_config()
     yield
+    reset_audit_hash_config()
     sanitize_mod._install_builtins()
 
 
@@ -37,10 +38,12 @@ def test_mask_none_and_scalar():
 
 
 def test_hash_value_none_and_scalar():
-    """Test hash_value function."""
+    """Test hash_value uses deterministic Argon2id audit digest."""
     assert hash_value(None) is None
-    expected = hashlib.sha256(b"hello").hexdigest()
+    expected = hash_audit_value("hello")
     assert hash_value("hello") == expected
+    assert len(expected) == 64
+    assert hash_value("hello") == hash_value("hello")
 
 
 def test_raw_passthrough():
@@ -53,7 +56,7 @@ def test_sanitize_builtins():
     """Test sanitize function."""
     assert sanitize("ignore", "x") is None
     assert sanitize("mask", "x") == "***"
-    assert sanitize("hash", "x") == hashlib.sha256(b"x").hexdigest()
+    assert sanitize("hash", "x") == hash_audit_value("x")
     assert sanitize("raw", "y") == "y"
 
 
