@@ -10,7 +10,8 @@ def audited(columns: dict[str, tuple[str, str]]):
     on_delete must be equally or more strict than persist (see register_audit_strategy strictness).
 
     Built-in masks: ``mask`` (generic ***), or ``mask:type=email``, ``mask:type=phone``,
-    ``mask:type=card``, ``mask:type=generic`` — all share the same strictness as ``mask``.
+    ``mask:type=card``, ``mask:type=name``, ``mask:type=generic`` — all share the same
+    strictness as ``mask``.
 
     __audit_config__ and __audit_config_on_delete__ are read-only mappings (MappingProxyType).
 

@@ -3,7 +3,7 @@ Audit value transforms and strategy registry.
 
 Built-in strategies: ignore, hash (Argon2id + pepper), mask, raw (each has a strictness rank).
 Parameterized masks use the same rank as ``mask``: ``mask:type=email``,
-``mask:type=phone``, ``mask:type=card``, ``mask:type=generic`` (or plain ``mask``).
+``mask:type=phone``, ``mask:type=card``, ``mask:type=name``, ``mask:type=generic`` (or plain ``mask``).
 
 Register custom strategies with register_audit_strategy(name, fn, strictness=...).
 Higher strictness = stronger hiding; on_delete strategy must be >= persist strictness.
@@ -27,7 +27,7 @@ _MASK_TYPE_PATTERN = re.compile(r"^mask:type=([a-z][a-z0-9_]*)$")
 # name -> (callable | None for ignore-like, strictness int; higher = stricter)
 _registry: dict[str, tuple[AuditTransform | None, int]] = {}
 
-_BUILTIN_MASK_TYPES = frozenset({"generic", "email", "phone", "card"})
+_BUILTIN_MASK_TYPES = frozenset({"generic", "email", "phone", "card", "name"})
 
 
 def mask(value: Any) -> Any:
@@ -70,11 +70,32 @@ def mask_card(value: Any) -> Any:
     return f"***{digits[-4:]}"
 
 
+def mask_name(value: Any) -> Any:
+    """
+    Mask each whitespace-separated word: first character kept, rest as asterisks.
+
+    Examples: García -> G*****; Fernández López -> F******** L****; Li -> L*.
+    """
+    if value is None:
+        return None
+    text = str(value).strip()
+    if not text:
+        return text
+
+    def mask_part(part: str) -> str:
+        if len(part) <= 1:
+            return "*"
+        return part[0] + "*" * (len(part) - 1)
+
+    return " ".join(mask_part(part) for part in text.split())
+
+
 _MASK_TYPE_TRANSFORMS: dict[str, AuditTransform] = {
     "generic": mask,
     "email": mask_email,
     "phone": mask_phone,
     "card": mask_card,
+    "name": mask_name,
 }
 
 

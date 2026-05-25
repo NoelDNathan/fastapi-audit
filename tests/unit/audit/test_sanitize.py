@@ -68,6 +68,12 @@ def test_sanitize_builtins():
         ("mask:type=phone", "+1 (555) 123-4567", "***4567"),
         ("mask:type=phone", "12", "***"),
         ("mask:type=card", "4242-4242-4242-4242", "***4242"),
+        ("mask:type=name", "García", "G*****"),
+        ("mask:type=name", "Fernández López", "F******** L****"),
+        ("mask:type=name", "Li", "L*"),
+        ("mask:type=name", "O'Connor", "O*******"),
+        ("mask:type=name", "De la Cruz", "D* l* C***"),
+        ("mask:type=name", "", ""),
         ("mask:type=generic", "secret", "***"),
         ("mask", "secret", "***"),
     ],
@@ -88,6 +94,7 @@ def test_parse_mask_strategy_and_validity():
     """Parse and validate mask parameter spellings."""
     assert parse_mask_strategy("mask") == "generic"
     assert parse_mask_strategy("mask:type=email") == "email"
+    assert parse_mask_strategy("mask:type=name") == "name"
     assert parse_mask_strategy("mask:type=unknown") is None
     assert parse_mask_strategy("mask:email") is None
     assert is_valid_strategy("mask:type=phone")
@@ -114,6 +121,7 @@ def test_mask_strategy_names():
     names = mask_strategy_names()
     assert "mask" in names
     assert "mask:type=email" in names
+    assert "mask:type=name" in names
     assert "mask:type=generic" in names
 
 
